@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import rospy
-from std_msgs.msg import Int64
+from sensor_pembot.msg import vel_motor # type: ignore
 
 class ControlConsole:
     def __init__(self, root):
@@ -31,11 +31,11 @@ class ControlConsole:
         self.btn_slow.grid(row=4, column=0, columnspan=3, sticky="ew", pady=5)
 
         # Speed state
-        self.speed = 0  # Default speed is slow
+        self.speed = 127  # Default speed is slow
 
         # ROS node initialization
         rospy.init_node('control_console', anonymous=True)
-        self.pub = rospy.Publisher('/cmd_vel', Int64, queue_size=10)
+        self.pub = rospy.Publisher('/cmd_vel', vel_motor, queue_size=10)
 
         # Timer
         self.current_command = None
@@ -51,15 +51,16 @@ class ControlConsole:
         self.root.after(1000 // self.publish_rate, self.run_publisher)
 
     def send_command(self, linear=0):
-        msg = Int64()
-        msg.data = int(linear)
+        msg = vel_motor()
+        msg.turn = int(linear)
+        msg.vel = self.speed
         self.pub.publish(msg)
-
-    def move_forward(self):
-        self.send_command(linear=2)
 
     def move_backward(self):
         self.send_command(linear=1)
+    
+    def move_forward(self):
+        self.send_command(linear=2)
 
     def turn_left(self):
         self.send_command(linear=3)
