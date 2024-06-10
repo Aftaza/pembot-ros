@@ -21,6 +21,7 @@ class RadarInterface:
         self.ax.set_ylim(0, 100)  # Mengatur ulang batas y untuk menampilkan data dari 0 hingga maksimum
         self.lims = [-10, 190]
         self.ax.set_thetalim(np.deg2rad(self.lims))
+        self.fig.canvas.set_window_title("Radar Ultrasonic")
         
         # Inisialisasi teks
         self.text = self.ax.text(0.5, 0.9, '', transform=self.ax.transAxes, ha='center')
@@ -62,7 +63,7 @@ class RadarInterface:
                 bar.set_color('blue')
         
         # Memperbarui teks
-        self.text.set_text(f'Start Angle: {self.start_angle}°\nEnd Angle: {self.end_angle}°')
+        self.text.set_text(f'Start Angle: {self.start_angle}°\nEnd Angle: {self.end_angle}°\nDistance: {self.current_distance} cm')
         
         return self.bars + (self.text,)
     
