@@ -1,14 +1,9 @@
-#!/usr/bin/env python
-
-import rospy
-from std_msgs.msg import Int32, Float32
 import tkinter as tk
 from tkinter import ttk
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from datetime import datetime
 
-class RobotStatusInterface:
-    def __init__(self, root):
+class MainConsole:
+    def _init_(self, root):
         self.root = root
         self.root.title("Robot Status Interface")
 
@@ -17,81 +12,59 @@ class RobotStatusInterface:
         self.speed_var = tk.StringVar()
         self.angle_var = tk.StringVar()
 
+        self.history_filename = "history.txt"
+
         self.create_widgets()
-        self.setup_ros()
 
     def create_widgets(self):
-        frame = ttk.Frame(self.root, padding="10")
+        style = ttk.Style()
+        style.configure("Custom.TLabel", foreground="black")
+
+        frame = ttk.Frame(self.root, padding="10", style="Custom.TFrame")
         frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
 
-        ttk.Label(frame, text="Status:").grid(row=0, column=0, sticky=tk.W)
-        ttk.Label(frame, textvariable=self.status_var).grid(row=0, column=1, sticky=tk.W)
+        ttk.Label(frame, text="Status:", style="Custom.TLabel").grid(row=0, column=0, sticky=tk.W, padx=(5, 10), pady=5)
+        ttk.Label(frame, text="RPM Roda:", style="Custom.TLabel").grid(row=0, column=3, sticky=tk.W, padx=(5, 10), pady=5)
+        ttk.Label(frame, text="Kecepatan (m/s):", style="Custom.TLabel").grid(row=0, column=5, sticky=tk.W, padx=(5, 10), pady=5)
+        ttk.Label(frame, text="Derajat Putar:", style="Custom.TLabel").grid(row=0, column=7, sticky=tk.W, padx=(5, 10), pady=5)
 
-        ttk.Label(frame, text="Roda RPM:").grid(row=1, column=0, sticky=tk.W)
-        ttk.Label(frame, textvariable=self.rpm_var).grid(row=1, column=1, sticky=tk.W)
+        # Add an empty row as separator
+        ttk.Label(frame, text="").grid(row=1, column=0, columnspan=8)
 
-        ttk.Label(frame, text="Kecepatan (m/s):").grid(row=2, column=0, sticky=tk.W)
-        ttk.Label(frame, textvariable=self.speed_var).grid(row=2, column=1, sticky=tk.W)
+        # Create a Text widget to display robot status
+        self.text_widget = tk.Text(frame, height=6, width=50)
+        self.text_widget.grid(row=1, column=0, columnspan=7, rowspan=3, padx=5, pady=5)
 
-        ttk.Label(frame, text="Derajat Putar:").grid(row=3, column=0, sticky=tk.W)
-        ttk.Label(frame, textvariable=self.angle_var).grid(row=3, column=1, sticky=tk.W)
+        # Add buttons
+        ttk.Button(frame, text="Start", command=self.start).grid(row=1, column=7, padx=5, pady=5, sticky=tk.E)
+        ttk.Button(frame, text="End", command=self.end).grid(row=2, column=7, padx=5, pady=5, sticky=tk.E)
+        ttk.Button(frame, text="Exit", command=self.exit).grid(row=3, column=7, padx=5, pady=5, sticky=tk.E)
 
-        # Create a matplotlib figure
-        self.figure = Figure(figsize=(5, 5), dpi=100)
-        self.ax = self.figure.add_subplot(111)
-        self.canvas = FigureCanvasTkAgg(self.figure, master=frame)
-        self.canvas.get_tk_widget().grid(row=4, column=0, columnspan=2)
+    def update_status_text(self):
+        status_text = f"Robot telah {self.status_var.get()} MAJU dengan {self.rpm_var.get()}10 RPM serta kecepatan {self.speed_var.get()}100m/s yang berputar sebesar 30 derajat {self.angle_var.get()}"
+        self.text_widget.delete('1.0', tk.END)
+        self.text_widget.insert(tk.END, status_text)
+        self.save_to_history(status_text)
 
-    def setup_ros(self):
-        rospy.init_node('robot_status_interface', anonymous=True)
-        rospy.Subscriber('/cmd_vel', Int32, self.cmd_vel_callback)
-        rospy.Subscriber('/wheel_rpm', Float32, self.rpm_callback)
-        rospy.Subscriber('/robot_speed', Float32, self.speed_callback)
-        rospy.Subscriber('/turn_angle', Float32, self.angle_callback)
+    def start(self):
+        self.text_widget.insert(tk.END, "\nProgram mulai!\n")
 
-    def cmd_vel_callback(self, data):
-        if data.data == 0:
-            self.status_var.set("Maju")
-        elif data.data == 1:
-            self.status_var.set("Mundur")
-        elif data.data == 2:
-            self.status_var.set("Putar Kanan")
-        elif data.data == 3:
-            self.status_var.set("Putar Kiri")
+    def end(self):
+        self.text_widget.insert(tk.END, "Program berhenti!\n")
 
-    def rpm_callback(self, data):
-        self.rpm_var.set(f"{data.data:.2f}")
+    def exit(self):
+        self.root.quit()
 
-    def speed_callback(self, data):
-        self.speed_var.set(f"{data.data:.2f}")
-
-    def angle_callback(self, data):
-        self.angle_var.set(f"{data.data:.2f}")
-
-    def update_plot(self):
-        self.ax.clear()
-        self.ax.set_xlim(0, 1)
-        self.ax.set_ylim(0, 1)
-        self.ax.set_aspect('equal')
-
-        status = self.status_var.get()
-        if status == "Maju":
-            self.ax.arrow(0.5, 0.5, 0, 0.1, head_width=0.05, head_length=0.05, fc='green', ec='green')
-        elif status == "Mundur":
-            self.ax.arrow(0.5, 0.5, 0, -0.1, head_width=0.05, head_length=0.05, fc='red', ec='red')
-        elif status == "Putar Kanan":
-            self.ax.arrow(0.5, 0.5, 0.1, 0.1, head_width=0.05, head_length=0.05, fc='orange', ec='orange')
-        elif status == "Putar Kiri":
-            self.ax.arrow(0.5, 0.5, -0.1, 0.1, head_width=0.05, head_length=0.05, fc='purple', ec='purple')
-
-        self.canvas.draw()
+    def save_to_history(self, status_text):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open(self.history_filename, "a") as f:
+            f.write(f"{timestamp}: {status_text}\n")
 
     def run(self):
-        self.root.after(100, self.update_plot)
+        self.update_status_text()
         self.root.mainloop()
-        rospy.spin()
 
 if __name__ == '__main__':
     root = tk.Tk()
-    app = RobotStatusInterface(root)
+    app = MainConsole(root)
     app.run()

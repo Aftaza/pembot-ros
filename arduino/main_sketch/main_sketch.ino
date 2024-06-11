@@ -1,3 +1,5 @@
+#include <WiFi.h>
+#define ROSSERIAL_ARDUINO_TCP
 #include <timer.h>
 #include <ros.h>
 #include <ESP32_Servo.h>
@@ -38,6 +40,13 @@ int counterRight = 0;
 float leftRPM;
 float rightRPM;
 
+//server settings
+IPAddress server(192,168,43,221);
+uint16_t serverPort = 11411;
+const char* ssid = "meizu";
+const char* password = "jeksentiago";
+
+
 ros::NodeHandle nh;
 
 //servo init
@@ -45,6 +54,18 @@ Servo myservo;
 
 // timer init
 Timer timer;
+
+void setupWiFi(){
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED){
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.print("SSID: ");
+  Serial.println(WiFi.SSID());
+  Serial.print("IP: ");
+  Serial.println(WiFi.localIP());
+}
 
 void mundur(int pwm){
   digitalWrite(leftMotor1, LOW);
@@ -151,6 +172,9 @@ void RPM(){
 
 void setup()
 { 
+  Serial.begin(115200);
+  setupWiFi();
+  delay(1000);
   pinMode(leftMotor1, OUTPUT);
   pinMode(leftMotor2, OUTPUT);
   pinMode(rightMotor1, OUTPUT);
@@ -171,11 +195,15 @@ void setup()
   timer.setCallback(RPM);
   timer.start();
 
+  nh.getHardware()->setConnection(server, serverPort);
   nh.initNode();
   nh.subscribe(subMotor);
   nh.subscribe(subServo);
   nh.advertise(ultrasonic_node);
   nh.advertise(optocoupler_node);
+
+  Serial.println("Get Ready");
+  delay(1000);
 }
 
 void loop()
