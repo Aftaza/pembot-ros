@@ -29,7 +29,7 @@ def process_draw_queue():
             t = 0
         else:
             t = current_time - prev_time
-        prev_time = current_time
+            prev_time = current_time
 
         # Extract data
         status = latest_data.cmd_vel.turn
