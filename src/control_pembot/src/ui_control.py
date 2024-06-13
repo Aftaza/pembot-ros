@@ -31,7 +31,7 @@ class ControlConsole:
         self.btn_slow.grid(row=4, column=0, columnspan=3, sticky="ew", pady=5)
 
         # Speed state
-        self.speed = 127  # Default speed is slow
+        self.speed = 85  # Default speed is slow
 
         # ROS node initialization
         rospy.init_node('control_console', anonymous=True)
@@ -73,11 +73,11 @@ class ControlConsole:
         self.send_command()
 
     def set_fast(self):
-        self.speed = 255
+        self.speed = 100
         messagebox.showinfo("Speed", "Kecepatan diatur ke Cepat")
 
     def set_slow(self):
-        self.speed = 127
+        self.speed = 85
         messagebox.showinfo("Speed", "Kecepatan diatur ke Lambat")
 
 if __name__ == "__main__":

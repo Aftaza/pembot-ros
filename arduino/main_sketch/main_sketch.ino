@@ -37,14 +37,16 @@ const int rotaryRight = 33;
 int counterLeft = 0;
 int counterRight = 0;
 
+float diskslots = 20;
+
 float leftRPM;
 float rightRPM;
 
 //server settings
 IPAddress server(192,168,43,221);
 uint16_t serverPort = 11411;
-const char* ssid = "meizu";
-const char* password = "jeksentiago";
+const char* ssid = "vivo1814";
+const char* password = "22222222";
 
 
 ros::NodeHandle nh;
@@ -72,7 +74,7 @@ void mundur(int pwm){
   digitalWrite(leftMotor2, HIGH);
   digitalWrite(rightMotor1, HIGH);
   digitalWrite(rightMotor2, LOW);
-  analogWrite(enaLeft, pwm);
+  analogWrite(enaLeft, pwm - 10);
   analogWrite(enaRight, pwm);
 }
 
@@ -81,7 +83,7 @@ void maju(int pwm){
   digitalWrite(leftMotor2, LOW);
   digitalWrite(rightMotor1, LOW);
   digitalWrite(rightMotor2, HIGH);
-  analogWrite(enaLeft, pwm);
+  analogWrite(enaLeft, pwm - 10);
   analogWrite(enaRight, pwm);
 }
 
@@ -90,7 +92,7 @@ void turnLeft(int pwm){
   digitalWrite(leftMotor2, HIGH);
   digitalWrite(rightMotor1, LOW);
   digitalWrite(rightMotor2, HIGH);
-  analogWrite(enaLeft, pwm);
+  analogWrite(enaLeft, pwm - 10);
   analogWrite(enaRight, pwm);
 }
 
@@ -99,7 +101,7 @@ void turnRight(int pwm){
   digitalWrite(leftMotor2, LOW);
   digitalWrite(rightMotor1, HIGH);
   digitalWrite(rightMotor2, LOW);
-  analogWrite(enaLeft, pwm);
+  analogWrite(enaLeft, pwm - 10);
   analogWrite(enaRight, pwm);
 }
 
@@ -164,8 +166,8 @@ void countRight(){
 }
 
 void RPM(){
-  leftRPM = counterLeft * 60;
-  rightRPM = counterRight * 60;
+  leftRPM = (counterLeft / diskslots) * 60;
+  rightRPM = (counterRight/ diskslots) * 60;
   counterLeft = 0;
   counterRight = 0;
 }

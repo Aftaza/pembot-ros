@@ -1,0 +1,17 @@
+<?xml version = "1.0"?>
+
+<launch>
+
+    <node pkg="rosserial_python" name="rosserial_tcp" type="serial_node.py" args="tcp" output="screen" />
+
+    <node pkg="sensor_pembot" name="radar_interface" type="radar.py" output="screen" />
+
+    <node pkg="sensor_pembot" name="sensor_process" type="sensor_process.py" output="screen" />
+
+    <node pkg="control_pembot" name="robot_visualization" type="robot_visualization.py" output="screen" />
+
+    <node pkg="control_pembot" name="robot_control" type="robot_control.py" output="screen" />
+
+    <node pkg="control_pembot" name="main_console" type="main_console.py" output="screen" />
+
+</launch>

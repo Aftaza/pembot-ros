@@ -52,6 +52,7 @@ add_message_files(
   FILES
   vel_motor.msg
   opt_rotary.msg
+  sensor_data.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -162,6 +163,7 @@ include_directories(
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   src/radar.py
+  src/sensor_process.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from sensor_pembot.msg import vel_motor
+from sensor_pembot.msg import sensor_data # type: ignore
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle, FancyArrow
 from matplotlib.animation import FuncAnimation
@@ -18,6 +18,7 @@ class RobotVisualizer:
         self.ax.set_ylim(0, 1)
         self.ax.set_aspect('equal')
         self.command = None
+        self.velo = 0
 
         # Sembunyikan label pada sumbu x dan y
         self.ax.set_xticks([])
@@ -26,13 +27,13 @@ class RobotVisualizer:
         self.ax.set_yticklabels([])
 
         rospy.init_node('robot_visualizer', anonymous=True)
-        rospy.Subscriber('/cmd_vel', vel_motor, self.callback)
+        rospy.Subscriber('/sensor_data', sensor_data, self.callback)
 
         self.ani = FuncAnimation(self.fig, self.update, interval=100)
         plt.show()
 
     def callback(self, msg):
-        self.command = msg.turn
+        self.command = msg.cmd_vel.turn
 
     def update(self, frame):
         if self.arrow:
@@ -41,10 +42,10 @@ class RobotVisualizer:
         if self.command is not None:
             if self.command == 2:  # Maju
                 self.arrow = FancyArrow(0.5, 0.55, 0, 0.1, width=0.05, color='green')
-                self.status_text.set_text('Maju')
+                self.status_text.set_text(f'Maju - {self.velo}m/s')
             elif self.command == 1:  # Mundur
                 self.arrow = FancyArrow(0.5, 0.35, 0, -0.1, width=0.05, color='red')
-                self.status_text.set_text('Mundur')
+                self.status_text.set_text(f'Mundur - {self.velo}m/s')
             elif self.command == 4:  # Putar kanan
                 self.arrow = FancyArrow(0.5, 0.55, 0.1, 0.1, width=0.05, color='orange')
                 self.status_text.set_text('Putar Kanan')

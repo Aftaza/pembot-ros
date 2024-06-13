@@ -163,6 +163,7 @@ catkin_install_python(PROGRAMS
   src/main_console.py
   src/ui_control.py
   src/robot_visualization.py
+  src/robot_control.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
