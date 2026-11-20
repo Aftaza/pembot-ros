@@ -45,8 +45,8 @@ float rightRPM;
 //server settings
 IPAddress server(192,168,43,221);
 uint16_t serverPort = 11411;
-const char* ssid = "vivo1814";
-const char* password = "22222222";
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
 
 
 ros::NodeHandle nh;
