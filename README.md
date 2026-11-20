@@ -1,8 +1,8 @@
 # Pembot: ROS Obstacle-Avoiding Robot
 
 Course project at Universitas Brawijaya (2024). A two-wheel ESP32 robot talks to ROS 1 over Wi-Fi
-(rosserial TCP). It sweeps an ultrasonic sensor on a servo, turns away from obstacles, and streams wheel RPM and
-speed back to a desktop console with a live radar view.
+(rosserial TCP). It slows down as an ultrasonic sensor sees an obstacle, turns away from it, and streams wheel RPM
+and speed back to a desktop console with a live radar view.
 
 ## Nodes
 
